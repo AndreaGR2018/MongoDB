@@ -1,42 +1,123 @@
-Diseño de la base de datos
-Caso de uso
+✅ Diseño de la base de datos – Catálogo de Productos (MongoDB)
+📌 Caso de uso
 
-Catálogo de productos para una tienda online: productos con atributos variables (tallas, colores, variantes), reseñas embebidas y operaciones de búsqueda/filtrado por precio, categoría y stock. MongoDB es apropiado por su esquema flexible y facilidad para almacenar documentos con arrays (variants, reviews).
+El caso de uso seleccionado es un catálogo de productos para una tienda online.
+Cada producto puede tener:
 
-Colecciones
+Variantes (color, talla)
 
-products
+Reseñas de usuarios
 
-_id : ObjectId
+Descripción y atributos básicos (precio, stock, categoría)
 
-productId : Number (opcional, identificador legible)
+MongoDB es una elección apropiada porque:
 
-name : String
+Permite un esquema flexible, ideal para productos con atributos variables.
 
-category : String
+Facilita almacenar documentos con arrays embebidos (variants, reviews).
 
-price : Number
+Evita la necesidad de múltiples tablas y joins como en SQL.
 
-stock : Number
+Permite consultas rápidas por categoría, precio o texto parcial.
 
-description : String
+📁 Colección principal: products
 
-variants : Array (e.g. [{ color: "Negro", size: 42 }])
+Cada documento en esta colección representa un producto del catálogo.
 
-rating : Number
+📝 Esquema del documento
 
-reviews : Array (e.g. [{ user: "Carlos", comment: "...", stars: 5 }])
+{
+  "_id": "ObjectId",
+  "productId": Number,
+  "name": "String",
+  "category": "String",
+  "price": Number,
+  "stock": Number,
+  "description": "String",
+  "variants": [
+    {
+      "color": "String",
+      "size": Number
+    }
+  ],
+  "rating": Number,
+  "reviews": [
+    {
+      "user": "String",
+      "comment": "String",
+      "stars": Number
+    }
+  ]
+}
 
-Decisiones de diseño
+📌 Descripción de los campos
+Campo	Tipo	Descripción
+_id	ObjectId	Identificador interno generado por MongoDB.
+productId	Number	ID legible para organización del catálogo.
+name	String	Nombre del producto.
+category	String	Categoría general (Ropa, Zapatos, etc.).
+price	Number	Precio del producto.
+stock	Number	Cantidad disponible en inventario.
+description	String	Breve descripción del producto.
+variants	Array	Lista de variaciones (color, talla).
+rating	Number	Promedio de calificaciones de usuarios.
+reviews	Array	Comentarios embebidos dentro del producto.
+🧩 Decisiones de diseño
+✔️ 1. Reseñas embebidas en products
 
-Reseñas embebidas en products para consultas habituales de lectura de producto.
+Se almacenan dentro del mismo documento porque:
 
-Variantes en array para representar colores/tallas.
+Son parte natural del producto.
 
-No se normalizan categorías (se usaría una colección aparte solo si fueran metadatos compartidos o reglas complejas).
+Se leen frecuentemente junto a la información del producto.
 
-Índices sugeridos
+Evita joins o lookup innecesarios.
+
+✔️ 2. Variantes dentro de un array
+
+Las variantes cambian según el producto (tallas, colores), por lo que un array embebido permite:
+
+Flexibilidad de estructura
+
+Representar múltiples combinaciones sin tablas adicionales
+
+✔️ 3. Categorías como string simple
+
+No se usa una colección aparte porque:
+
+Los productos solo necesitan filtrar por categoría.
+
+No hay metadatos complejos asociados.
+
+Evita sobre-normalización.
+
+⚡ Índices sugeridos
+
+Para mejorar el rendimiento de las búsquedas:
+
+// Búsquedas por nombre
 db.products.createIndex({ name: 1 });
+
+// Filtros combinados: categoría + ordenamiento por precio
 db.products.createIndex({ category: 1, price: -1 });
 
-Motivo: acelerar búsquedas por nombre y filtros por categoría + ordenamiento por precio.
+Motivo:
+
+Acelerar búsquedas por nombre parcial o exacto.
+
+Optimizar queries mixtas como:
+
+db.products.find({ category: "Ropa" }).sort({ price: -1 });
+
+
+🏁 Conclusión
+
+El diseño está optimizado para:
+
+Productos con atributos variables
+
+Reseñas y variantes sin necesidad de tablas adicionales
+
+Consultas de usuario final (precio, categoría, stock, nombre)
+
+Operaciones rápidas en MongoDB gracias a los índices recomendados
