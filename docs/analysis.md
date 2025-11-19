@@ -1,27 +1,26 @@
-## 1. Conteo por categoría
+Análisis de Agregaciones – MongoDB
 
-### Pipeline
-```js
+1. Conteo por categoría
+
+Pipeline
 [
   { $group: { _id: "$category", total: { $sum: 1 } } },
   { $sort: { total: -1 } }
-] 
-```
+]
 
 Resultado
-```json
 [
   { "_id": "Ropa", "total": 52 },
   { "_id": "Zapatos", "total": 50 }
 ]
-```
 
 Interpretación del resultado
-La categoría "Ropa" contiene 52 productos, mientras que "Zapatos" contiene 50.
+
+La categoría Ropa contiene 52 productos, mientras que Zapatos contiene 50.
 Esto muestra una distribución casi equilibrada en el inventario, con una ligera mayor oferta de ropa.
 
-
 2. Promedio, mínimo y máximo de precio por categoría
+
 Pipeline
 [
   { 
@@ -55,12 +54,12 @@ Interpretación del resultado
 
 La categoría Zapatos tiene un promedio de precio más alto (135,540) que Ropa (64,211.54).
 
-Los precios mínimos y máximos muestran que Zapatos tiene mayor rango de precios.
+Zapatos también presenta un rango mayor de precios.
 
-Esto indica que los zapatos son generalmente más caros y tienen más variación de precio que la ropa.
-
+Esto indica que los zapatos suelen ser más costosos y tienen más variaciones de precio que la ropa.
 
 3. Suma total de stock
+
 Pipeline
 [
   { $group: { _id: null, totalStock: { $sum: "$stock" } } }
@@ -76,13 +75,14 @@ Resultado
 
 Interpretación del resultado
 
-La suma total de stock de todos los productos es 1,727 unidades.
+El inventario total suma 1,727 unidades.
 
-Esto indica que, en conjunto, el inventario tiene suficiente disponibilidad para las ventas actuales.
+Esta cantidad indica buena disponibilidad general.
 
-Se podría usar esta cifra para planificar reabastecimientos o promociones de productos con menor stock.
+Los administradores pueden usar esta información para decidir si es necesario reabastecer o redistribuir productos.
 
 4. Top 5 productos más caros
+
 Pipeline
 [
   { $sort: { price: -1 } },
@@ -101,16 +101,16 @@ Resultado
 
 Interpretación del resultado
 
-Todos los productos más caros son de la categoría Zapatos.
+Todos los productos más caros pertenecen a la categoría Zapatos.
 
-El precio más alto es 165,000 y el más bajo dentro del top 5 es 160,000.
+El precio más alto es 165,000 y el más bajo del top 5 es 160,000.
 
-Esto indica que los zapatos tienden a tener precios elevados y una mayor variación en el rango superior.
+Esto muestra que los zapatos dominan el rango premium y pueden generar más ingresos por venta.
 
-Estrategia recomendada: se podrían promover ofertas o bundles de zapatos de alto valor para maximizar ventas.
-
+Recomendación: ofrecer bundles o promociones de zapatos de gama alta.
 
 5. Distribución de precios (buckets)
+
 Pipeline
 [
   { 
@@ -137,10 +137,10 @@ Resultado
 
 Interpretación del resultado
 
-La mayoría de los productos (48) se encuentran en el rango de 50,000–79,999, con un promedio cercano a 63,479.
+La mayoría de los productos (48) están en el rango de 50,000–79,999, con un precio promedio de 63,479.
 
-Hay 32 productos entre 120,000–159,999, y 7 productos muy caros entre 160,000–199,999.
+32 productos se encuentran en el rango 120,000–159,999, mostrando que hay una fuerte presencia en precios medios-altos.
 
-Solo 2 productos están por debajo de 50,000.
+Solo 2 productos tienen precios menores a 50,000.
 
-Esto indica que la tienda tiene un inventario más concentrado en precios medios, con pocos productos muy baratos o muy caros. La distribución puede ayudar a decidir promociones según los rangos de precio y orientar la estrategia de marketing.
+Esto sugiere que la tienda se enfoca más en productos de gama media y alta, lo cual influye en estrategias de precio, marketing y ventas.
